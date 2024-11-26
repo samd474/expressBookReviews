@@ -1,21 +1,31 @@
 const express = require('express');
 let books = require("./booksdb.js");
-let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
+// Function to validate user data
+function isValid(username, password) {
+  // Add your validation logic here (e.g., check if username is unique, password strength, etc.)
+  if (!username || !password) return false;
+  return true;
+}
 
-public_users.post("/register", (req,res) => {
-  //Write your code here
-  if(isValid(req.body.username)){
-    users.push(req.body);
-    return res.status(200).json({message: "User registered successfully"});
+public_users.post("/register", (req, res) => {
+  const { username, password } = req.body;
+
+  if (isValid(username, password)) {
+    // Check if the username already exists
+    const userExists = users.some(user => user.username === username);
+    if (userExists) {
+      return res.status(400).json({ message: "Username already exists" });
+    }
+
+    // Add the new user to the users array
+    users.push({ username, password });
+    return res.status(200).json({ message: "User registered successfully" });
   } else {
-    return res.status(400).json({message: "Invalid username"});
-  };
-});
-if(isValid(req.body.password)){
-  return res.status(300).json({message: "Yet to be implemented"});
+    return res.status(400).json({ message: "Invalid username or password" });
+  }
 });
 
 // Get the book list available in the shop
@@ -62,5 +72,7 @@ public_users.get('/review/:isbn',function (req, res) {
   });
   return res.status(300).json({message: "Books reviews by ISBN", books: books_review});
 });
+
+
 
 module.exports.general = public_users;
