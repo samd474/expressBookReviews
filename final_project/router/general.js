@@ -93,6 +93,30 @@ public_users.get('/title/:title', function (req, res) {
   });
 });
 
+// Delete a book review based on user
+public_users.delete('/auth/review/:isbn', (req, res) => {
+  const { isbn } = req.params;
+  const { username } = req.body; // Assuming the username is passed in the request body
+
+  // Find the book by ISBN
+  const book = books.find(book => book.isbn === isbn);
+
+  if (book) {
+    // Find the review by username
+    const reviewIndex = book.reviews.findIndex(review => review.username === username);
+
+    if (reviewIndex !== -1) {
+      // Remove the review
+      book.reviews.splice(reviewIndex, 1);
+      return res.status(200).json({ message: "Review deleted successfully", book });
+    } else {
+      return res.status(404).json({ message: "Review not found" });
+    }
+  } else {
+    return res.status(404).json({ message: "Book not found" });
+  }
+});
+
 // Get book review
 public_users.get('/review/:isbn', function (req, res) {
   const books_review = books.filter((book) => {
