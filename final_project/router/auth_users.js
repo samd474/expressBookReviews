@@ -52,6 +52,26 @@ public_users.put('/review/:isbn',function (req, res) {
 });  
 });
 
+//Delete a book review
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+public_users.delete('/review/:isbn',function (req, res) {
+  //Write your code here
+  delete_review = books.filter((book) => {
+    return book.isbn === req.params.isbn;
+  });
+  confirm_delete = books.filter((book) => {
+    return book.isbn !== req.params.isbn;
+  });
+  
+  if(delete_review === confirm_delete){
+    return res.status(200).json({message: "Review deleted successfully"});
+  } else {
+    return res.status(400).json({message: "Review not deleted"});
+  };
+  return res.status(300).json({message: "Delete book review", books: delete_review});
+});  
+});
+
 
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
